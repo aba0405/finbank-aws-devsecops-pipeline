@@ -1,0 +1,20 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "InspectorForEnhancedEcrScanning",
+      "Effect": "Allow",
+      "Action": [
+        "inspector2:ListAccountPermissions",
+        "inspector2:Enable",
+        "inspector2:Disable",
+        "inspector2:BatchGetAccountStatus",
+        "inspector2:ListCoverage",
+        "inspector2:ListFindings",
+        "inspector2:GetConfiguration",
+        "inspector2:UpdateConfiguration"
+      ],
+      "Resource": "*"
+    }
+  ]
+}

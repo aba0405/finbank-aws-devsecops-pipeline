@@ -4,7 +4,6 @@
 *.tfstate.*
 *.tfvars
 crash.log
-.terraform.lock.hcl
 
 # Python
 __pycache__/
