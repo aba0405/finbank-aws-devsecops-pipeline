@@ -3,8 +3,11 @@ terraform {
 
   required_providers {
     aws = {
-      source  = "hashicorp/aws"
-      version = "~> 5.0"
+      source = "hashicorp/aws"
+      # Bumped from ~> 5.0 in Phase 2: the terraform-aws-modules/vpc v6 module
+      # requires provider v6. Provider v6 is backward-compatible with the ECR
+      # resources from Phase 1, so this is a safe in-place bump.
+      version = "~> 6.0"
     }
   }
 
