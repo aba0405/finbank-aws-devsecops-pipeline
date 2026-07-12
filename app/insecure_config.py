@@ -1,17 +1,20 @@
 # DELIBERATELY INSECURE -- security-gate demo ONLY. DO NOT merge to main.
 #
-# This simulates FinBank's real incident: "hardcoded AWS credentials committed
-# to GitHub." The values below are AWS's PUBLISHED documentation placeholders
-# (AKIAIOSFODNN7EXAMPLE), not live credentials -- but they match the pattern
-# secret scanners flag, which is the point of the demo.
+# Simulates FinBank's real incident: "hardcoded AWS credentials committed to
+# GitHub." The key below is FAKE (randomly constructed, not a live credential)
+# but uses a realistic AKIA-prefixed format that git-secrets flags.
+#
+# NOTE: we deliberately do NOT use AWS's documented example key
+# (AKIAIOSFODNN7EXAMPLE) because git-secrets allow-lists that specific string.
+# Using a non-allowlisted fake key is what makes the gate actually fire.
 #
 # A secret-scanning gate should flag this file and block the pipeline.
 
 import boto3
 
-# BAD: hardcoded credentials in source (this is exactly what you must never do)
-AWS_ACCESS_KEY_ID = "AKIAIOSFODNN7EXAMPLE"
-AWS_SECRET_ACCESS_KEY = "wJalrXUtnFEMI/K7MDENG/bPxRfiCYEXAMPLEKEY"
+# BAD: hardcoded credentials in source (exactly what you must never do)
+AWS_ACCESS_KEY_ID = "AKIAZ7XR2NBQK4WT9GDL"
+AWS_SECRET_ACCESS_KEY = "8Hy2Kf9pQzRtVwNxLmBcJdEgAhZ3sTuYn6vWqXr"
 
 def make_client():
     # BAD: passing static long-lived keys instead of using an IAM role
