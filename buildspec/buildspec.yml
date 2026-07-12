@@ -4,14 +4,13 @@ version: 0.2
 #
 # Layered gates:
 #   1. Secret scan (git-secrets) -- fails the build if hardcoded credentials
-#      are found in source. Runs BEFORE the image is built, so a leaked secret
-#      never even produces an artifact. Complements the pipeline's InspectorScan
-#      actions (which do SCA/vuln scanning but not secret detection).
-#   2. Build + push (two tags: short-SHA for traceability, latest as the moving
-#      pointer the ImageScan action and ECS deploy target).
+#      are found in source. Runs BEFORE the image is built.
+#      NOTE: CodePipeline delivers source as a plain file bundle (no .git), so
+#      we init a throwaway git repo first -- git-secrets stores its patterns in
+#      git config and needs a repo to operate.
+#   2. Build + push (short-SHA tag for traceability, latest as the moving tag).
 #
-# Required env vars (set on the CodeBuild project by Terraform):
-#   AWS_ACCOUNT_ID, AWS_REGION, ECR_REPO_URL, CONTAINER_NAME
+# Required env vars: AWS_ACCOUNT_ID, AWS_REGION, ECR_REPO_URL, CONTAINER_NAME
 
 phases:
   install:
@@ -24,10 +23,14 @@ phases:
     commands:
       # ---- SECRET SCAN GATE ----
       - echo "Scanning source for hardcoded secrets..."
-      - git secrets --register-aws        # load AWS credential patterns
-      - git secrets --install -f          # set up hooks in the checked-out repo
-      # Scan all files. If a secret is found, git-secrets exits non-zero and the
-      # build fails here -- before any image is built or pushed.
+      # CodePipeline source has no .git; init a throwaway repo so git-secrets
+      # has git config to register patterns against.
+      - git init -q .
+      - git config user.email "ci@finbank.local"
+      - git config user.name "finbank-ci"
+      - git secrets --register-aws
+      # --scan -r scans recursively. Exits non-zero if a secret is found,
+      # failing the build here before any image is built or pushed.
       - git secrets --scan -r .
       - echo "No secrets found. Proceeding to build."
       # ---- ECR login ----
