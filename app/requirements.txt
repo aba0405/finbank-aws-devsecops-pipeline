@@ -1,2 +1,18 @@
-Flask==3.0.3
-gunicorn==22.0.0
+# DELIBERATELY VULNERABLE -- for the security-gate demo ONLY.
+# These are old versions with well-known, published CVEs. The ImageScan gate
+# should block any image built from this. DO NOT merge to main.
+#
+# Why these:
+#   Flask 0.12.2      - old, multiple CVEs in the stack
+#   Werkzeug 0.14.1   - known CVEs (debugger RCE etc.)
+#   Jinja2 2.10       - known CVEs
+#   PyYAML 3.13       - CVE-2020-1747 / CVE-2020-14343 (arbitrary code exec on load)
+#   requests 2.19.1   - older, CVEs
+#   urllib3 1.24.1    - known CVEs
+Flask==0.12.2
+Werkzeug==0.14.1
+Jinja2==2.10
+PyYAML==3.13
+requests==2.19.1
+urllib3==1.24.1
+gunicorn==19.7.1
