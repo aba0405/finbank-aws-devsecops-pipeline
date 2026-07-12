@@ -45,6 +45,11 @@ variable "region" {
 module "ecr" {
   source          = "../../modules/ecr"
   repository_name = "finbank-digital"
+  # MUTABLE so the pipeline can push a moving :latest tag that the ImageScan
+  # action and ECS deploy target. SHA tags still give per-commit traceability;
+  # :latest is the moving pointer. Tradeoff vs IMMUTABLE: simpler pipeline wiring
+  # at the cost of :latest not being pinned to one image. Documented in README.
+  image_tag_mutability = "MUTABLE"
 }
 
 output "ecr_repository_url" {

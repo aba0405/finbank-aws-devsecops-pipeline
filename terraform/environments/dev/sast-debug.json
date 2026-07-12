@@ -1,0 +1,216 @@
+{
+    "actionExecutionDetails": [
+        {
+            "pipelineExecutionId": "fd345777-10e2-454f-93c4-44ba372c7f21",
+            "actionExecutionId": "0e336b8d-f649-44b5-b0fc-2331accb26cb",
+            "pipelineVersion": 1,
+            "stageName": "SASTScan",
+            "actionName": "SourceCodeScan",
+            "startTime": "2026-07-12T00:13:34.228000-04:00",
+            "lastUpdateTime": "2026-07-12T00:14:06.165000-04:00",
+            "status": "Failed",
+            "input": {
+                "actionTypeId": {
+                    "category": "Invoke",
+                    "owner": "AWS",
+                    "provider": "InspectorScan",
+                    "version": "1"
+                },
+                "configuration": {
+                    "CriticalThreshold": "5",
+                    "HighThreshold": "10",
+                    "InspectorRunMode": "SourceCodeScan"
+                },
+                "resolvedConfiguration": {
+                    "CriticalThreshold": "5",
+                    "HighThreshold": "10",
+                    "InspectorRunMode": "SourceCodeScan"
+                },
+                "region": "us-east-1",
+                "inputArtifacts": [
+                    {
+                        "name": "source_output",
+                        "s3location": {
+                            "bucket": "finbank-pipeline-artifacts-4f38d188",
+                            "key": "finbank-pipeline/source_out/cc5OXxa"
+                        }
+                    }
+                ]
+            },
+            "output": {
+                "outputArtifacts": [],
+                "executionResult": {
+                    "externalExecutionSummary": "Action failed with status: FAILED. Service role does not have permissions to create Amazon Cloudwatch log streams. Add logs:CreateLogGroup, logs:CreateLogStream, logs:PutLogEventspermissions to your service role. Default log group is /aws/codepipeline/<pipeline-name>",
+                    "errorDetails": {
+                        "code": "JobFailed"
+                    }
+                },
+                "outputVariables": {}
+            }
+        },
+        {
+            "pipelineExecutionId": "fd345777-10e2-454f-93c4-44ba372c7f21",
+            "actionExecutionId": "a5c2b5bb-f3c2-471a-839f-f0711f09d7a2",
+            "pipelineVersion": 1,
+            "stageName": "Source",
+            "actionName": "Source",
+            "startTime": "2026-07-12T00:13:30.670000-04:00",
+            "lastUpdateTime": "2026-07-12T00:13:33.555000-04:00",
+            "status": "Succeeded",
+            "input": {
+                "actionTypeId": {
+                    "category": "Source",
+                    "owner": "AWS",
+                    "provider": "CodeStarSourceConnection",
+                    "version": "1"
+                },
+                "configuration": {
+                    "BranchName": "main",
+                    "ConnectionArn": "arn:aws:codestar-connections:us-east-1:649966626634:connection/cc01aef9-537d-4b58-9704-70e68932efa4",
+                    "FullRepositoryId": "aba0405/finbank-aws-devsecops-pipeline"
+                },
+                "resolvedConfiguration": {
+                    "BranchName": "main",
+                    "ConnectionArn": "arn:aws:codestar-connections:us-east-1:649966626634:connection/cc01aef9-537d-4b58-9704-70e68932efa4",
+                    "FullRepositoryId": "aba0405/finbank-aws-devsecops-pipeline"
+                },
+                "region": "us-east-1",
+                "inputArtifacts": []
+            },
+            "output": {
+                "outputArtifacts": [
+                    {
+                        "name": "source_output",
+                        "s3location": {
+                            "bucket": "finbank-pipeline-artifacts-4f38d188",
+                            "key": "finbank-pipeline/source_out/cc5OXxa"
+                        }
+                    }
+                ],
+                "executionResult": {
+                    "externalExecutionId": "2d00ee727cf9940e6e69afba09ef477a8eb6c57c",
+                    "externalExecutionSummary": "{\"ProviderType\":\"GitHub\",\"CommitMessage\":\"feat: add AWS-native CI/CD pipeline with InspectorScan security gates\\n\\nPhase 3 complete. Full pipeline: Source (GitHub) -> SAST scan -> Build ->\\nImage scan -> Deploy to ECS. All AWS-native, all in Terraform.\\n\\nPipeline (CodePipeline V2, required for InspectorScan actions):\\n- Source: GitHub via CodeConnection (OAuth completed in console)\\n- SASTScan: InspectorScan SourceCodeScan action\\n- Build: CodeBuild builds image, pushes SHA-tagged to ECR (immutable)\\n- ImageScan: InspectorScan ECRImageScan, CALIBRATED to baseline (2C/7H/8M):\\n  normal image passes, regressions above baseline are blocked\\n- Deploy: ECS rolling deploy via imagedefinitions.json\\n\\nLeast-privilege service roles: separate scoped roles for CodeBuild and\\nCodePipeline, distinct from the human build user.\\n\\nIAM refactor: hit the 10-managed-policy-per-user limit mid-phase. Consolidated\\nten incremental phase policies into three function-scoped policies\\n(infra-core, containers, pipeline), each under the 6 KB cap. Incremental\\noriginals retained in-repo as a record of the least-privilege discovery.\\n\\nWhat broke and what I learned:\\n- InspectorScan actions require pipeline_type V2; Terraform defaults to V1\\n- Enhanced ECR scanning is powered by Inspector v2 -- needs its own\\n  service-linked role, a third SLR beyond ELB and ECS\\n- Threshold philosophy: calibrated gates to baseline beat naive zero-tolerance\\n  gates that teams end up disabling\\n\\nKnown limitations: threshold gating is count-based (co\"}",
+                    "externalExecutionUrl": "https://us-east-1.console.aws.amazon.com/codesuite/settings/connections/redirect?connectionArn=arn:aws:codestar-connections:us-east-1:649966626634:connection/cc01aef9-537d-4b58-9704-70e68932efa4&referenceType=COMMIT&FullRepositoryId=aba0405/finbank-aws-devsecops-pipeline&Commit=2d00ee727cf9940e6e69afba09ef477a8eb6c57c"
+                },
+                "outputVariables": {
+                    "AuthorDate": "2026-07-12T04:12:41Z",
+                    "AuthorDisplayName": "aba0405",
+                    "AuthorEmail": "60788914+aba0405@users.noreply.github.com",
+                    "AuthorId": "aba0405",
+                    "BranchName": "main",
+                    "CommitId": "2d00ee727cf9940e6e69afba09ef477a8eb6c57c",
+                    "CommitMessage": "feat: add AWS-native CI/CD pipeline with InspectorScan security gates\n\nPhase 3 complete. Full pipeline: Source (GitHub) -> SAST scan -> Build ->\nImage scan -> Deploy to ECS. All AWS-native, all in Terraform.\n\nPipeline (CodePipeline V2, required for InspectorScan actions):\n- Source: GitHub via CodeConnection (OAuth completed in console)\n- SASTScan: InspectorScan SourceCodeScan action\n- Build: CodeBuild builds image, pushes SHA-tagged to ECR (immutable)\n- ImageScan: InspectorScan ECRImageScan, CALIBRATED to baseline (2C/7H/8M):\n  normal image passes, regressions above baseline are blocked\n- Deploy: ECS rolling deploy via imagedefinitions.json\n\nLeast-privilege service roles: separate scoped roles for CodeBuild and\nCodePipeline, distinct from the human build user.\n\nIAM refactor: hit the 10-managed-policy-per-user limit mid-phase. Consolidated\nten incremental phase policies into three function-scoped policies\n(infra-core, containers, pipeline), each under the 6 KB cap. Incremental\noriginals retained in-repo as a record of the least-privilege discovery.\n\nWhat broke and what I learned:\n- InspectorScan actions require pipeline_type V2; Terraform defaults to V1\n- Enhanced ECR scanning is powered by Inspector v2 -- needs its own\n  service-linked role, a third SLR beyond ELB and ECS\n- Threshold philosophy: calibrated gates to baseline beat naive zero-tolerance\n  gates that teams end up disabling\n\nKnown limitations: threshold gating is count-based (could miss a vuln at/under\nbaseline); production would add CVE denylists an",
+                    "ConnectionArn": "arn:aws:codestar-connections:us-east-1:649966626634:connection/cc01aef9-537d-4b58-9704-70e68932efa4",
+                    "FullRepositoryName": "aba0405/finbank-aws-devsecops-pipeline",
+                    "ProviderType": "GitHub"
+                }
+            }
+        },
+        {
+            "pipelineExecutionId": "11413ca2-655a-45f8-8b47-12a1044cd672",
+            "actionExecutionId": "c8f9d070-eafa-4680-861a-5f4528cea6b3",
+            "pipelineVersion": 1,
+            "stageName": "SASTScan",
+            "actionName": "SourceCodeScan",
+            "startTime": "2026-07-12T00:02:23.720000-04:00",
+            "lastUpdateTime": "2026-07-12T00:02:56.954000-04:00",
+            "status": "Failed",
+            "input": {
+                "actionTypeId": {
+                    "category": "Invoke",
+                    "owner": "AWS",
+                    "provider": "InspectorScan",
+                    "version": "1"
+                },
+                "configuration": {
+                    "CriticalThreshold": "5",
+                    "HighThreshold": "10",
+                    "InspectorRunMode": "SourceCodeScan"
+                },
+                "resolvedConfiguration": {
+                    "CriticalThreshold": "5",
+                    "HighThreshold": "10",
+                    "InspectorRunMode": "SourceCodeScan"
+                },
+                "region": "us-east-1",
+                "inputArtifacts": [
+                    {
+                        "name": "source_output",
+                        "s3location": {
+                            "bucket": "finbank-pipeline-artifacts-4f38d188",
+                            "key": "finbank-pipeline/source_out/tWnJXWa"
+                        }
+                    }
+                ]
+            },
+            "output": {
+                "outputArtifacts": [],
+                "executionResult": {
+                    "externalExecutionSummary": "Action failed with status: FAILED. Service role does not have permissions to create Amazon Cloudwatch log streams. Add logs:CreateLogGroup, logs:CreateLogStream, logs:PutLogEventspermissions to your service role. Default log group is /aws/codepipeline/<pipeline-name>",
+                    "errorDetails": {
+                        "code": "JobFailed"
+                    }
+                },
+                "outputVariables": {}
+            }
+        },
+        {
+            "pipelineExecutionId": "11413ca2-655a-45f8-8b47-12a1044cd672",
+            "actionExecutionId": "763a70dd-5a4b-443f-96b1-32cb3ada4674",
+            "pipelineVersion": 1,
+            "stageName": "Source",
+            "actionName": "Source",
+            "startTime": "2026-07-12T00:02:19.920000-04:00",
+            "lastUpdateTime": "2026-07-12T00:02:23.039000-04:00",
+            "status": "Succeeded",
+            "input": {
+                "actionTypeId": {
+                    "category": "Source",
+                    "owner": "AWS",
+                    "provider": "CodeStarSourceConnection",
+                    "version": "1"
+                },
+                "configuration": {
+                    "BranchName": "main",
+                    "ConnectionArn": "arn:aws:codestar-connections:us-east-1:649966626634:connection/cc01aef9-537d-4b58-9704-70e68932efa4",
+                    "FullRepositoryId": "aba0405/finbank-aws-devsecops-pipeline"
+                },
+                "resolvedConfiguration": {
+                    "BranchName": "main",
+                    "ConnectionArn": "arn:aws:codestar-connections:us-east-1:649966626634:connection/cc01aef9-537d-4b58-9704-70e68932efa4",
+                    "FullRepositoryId": "aba0405/finbank-aws-devsecops-pipeline"
+                },
+                "region": "us-east-1",
+                "inputArtifacts": []
+            },
+            "output": {
+                "outputArtifacts": [
+                    {
+                        "name": "source_output",
+                        "s3location": {
+                            "bucket": "finbank-pipeline-artifacts-4f38d188",
+                            "key": "finbank-pipeline/source_out/tWnJXWa"
+                        }
+                    }
+                ],
+                "executionResult": {
+                    "externalExecutionId": "bd2bbe6203ff6cfdb528181c3ade16dc3a8dfc01",
+                    "externalExecutionSummary": "{\"ProviderType\":\"GitHub\",\"CommitMessage\":\"feat: provision VPC, ALB, ECS Fargate, and least-privilege IAM roles\\n\\nPhase 2 complete. App runs on Fargate behind an ALB, reachable only through\\nthe load balancer. All infrastructure defined in Terraform.\\n\\nArchitecture:\\n- VPC with 2 public subnets across AZs (no NAT: ~$32/mo saved; tradeoff noted)\\n- Paired security groups: ALB allows :80 from internet, task SG allows :8080\\n  ONLY from the ALB SG -- compensating control for public-subnet tasks\\n- ECS Fargate, 1 task @ 0.25vCPU/512MB, image pulled from ECR (v1)\\n- Separate task execution role (ECR pull + logs) and task role (empty by\\n  design; the app makes no AWS API calls)\\n- CloudWatch log group wired into the task definition\\n\\nWhat broke and what I learned:\\n- 5 IAM permission walls. Discovered least privilege incrementally rather\\n  than granting ec2:* / elasticloadbalancing:*\\n- VPC module modifies AWS's DEFAULT NACL and security group to harden them,\\n  requiring NACL-entry and SG-rule actions beyond simple create perms\\n- ALB and ECS each require a one-time service-linked role. Scoped both grants\\n  to the exact role ARN plus an iam:AWSServiceName condition key\\n- Terraform caught an AWS constraint: security group descriptions reject '>'\\n- ELB read-back actions (DescribeListenerAttributes) only surface at apply time\\n\\nKnown limitations (production would differ):\\n- HTTP only; prod terminates HTTPS on the ALB with an ACM cert\\n- 1 task, no HA; prod runs >=2 across AZs\\n- Tasks in public subnets; pro\"}",
+                    "externalExecutionUrl": "https://us-east-1.console.aws.amazon.com/codesuite/settings/connections/redirect?connectionArn=arn:aws:codestar-connections:us-east-1:649966626634:connection/cc01aef9-537d-4b58-9704-70e68932efa4&referenceType=COMMIT&FullRepositoryId=aba0405/finbank-aws-devsecops-pipeline&Commit=bd2bbe6203ff6cfdb528181c3ade16dc3a8dfc01"
+                },
+                "outputVariables": {
+                    "AuthorDate": "2026-07-08T23:04:04Z",
+                    "AuthorDisplayName": "aba0405",
+                    "AuthorEmail": "60788914+aba0405@users.noreply.github.com",
+                    "AuthorId": "aba0405",
+                    "BranchName": "main",
+                    "CommitId": "bd2bbe6203ff6cfdb528181c3ade16dc3a8dfc01",
+                    "CommitMessage": "feat: provision VPC, ALB, ECS Fargate, and least-privilege IAM roles\n\nPhase 2 complete. App runs on Fargate behind an ALB, reachable only through\nthe load balancer. All infrastructure defined in Terraform.\n\nArchitecture:\n- VPC with 2 public subnets across AZs (no NAT: ~$32/mo saved; tradeoff noted)\n- Paired security groups: ALB allows :80 from internet, task SG allows :8080\n  ONLY from the ALB SG -- compensating control for public-subnet tasks\n- ECS Fargate, 1 task @ 0.25vCPU/512MB, image pulled from ECR (v1)\n- Separate task execution role (ECR pull + logs) and task role (empty by\n  design; the app makes no AWS API calls)\n- CloudWatch log group wired into the task definition\n\nWhat broke and what I learned:\n- 5 IAM permission walls. Discovered least privilege incrementally rather\n  than granting ec2:* / elasticloadbalancing:*\n- VPC module modifies AWS's DEFAULT NACL and security group to harden them,\n  requiring NACL-entry and SG-rule actions beyond simple create perms\n- ALB and ECS each require a one-time service-linked role. Scoped both grants\n  to the exact role ARN plus an iam:AWSServiceName condition key\n- Terraform caught an AWS constraint: security group descriptions reject '>'\n- ELB read-back actions (DescribeListenerAttributes) only surface at apply time\n\nKnown limitations (production would differ):\n- HTTP only; prod terminates HTTPS on the ALB with an ACM cert\n- 1 task, no HA; prod runs >=2 across AZs\n- Tasks in public subnets; prod uses private subnets + NAT or VPC endpoints\n- Local Terraform state; p",
+                    "ConnectionArn": "arn:aws:codestar-connections:us-east-1:649966626634:connection/cc01aef9-537d-4b58-9704-70e68932efa4",
+                    "FullRepositoryName": "aba0405/finbank-aws-devsecops-pipeline",
+                    "ProviderType": "GitHub"
+                }
+            }
+        }
+    ]
+}

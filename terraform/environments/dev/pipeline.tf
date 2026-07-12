@@ -79,6 +79,23 @@ data "aws_iam_policy_document" "codepipeline_permissions" {
     resources = ["*"]
   }
 
+  # The InspectorScan action runs on managed CodeBuild compute and writes its
+  # scan logs to CloudWatch. Without this, the action fails with:
+  # "Service role does not have permissions to create CloudWatch log streams."
+  statement {
+    sid    = "InspectorScanLogs"
+    effect = "Allow"
+    actions = [
+      "logs:CreateLogGroup",
+      "logs:CreateLogStream",
+      "logs:PutLogEvents"
+    ]
+    resources = [
+      "arn:aws:logs:${var.region}:*:log-group:/aws/codepipeline/finbank-pipeline",
+      "arn:aws:logs:${var.region}:*:log-group:/aws/codepipeline/finbank-pipeline:*"
+    ]
+  }
+
   statement {
     sid    = "EcrReadForScan"
     effect = "Allow"
@@ -211,8 +228,8 @@ resource "aws_codepipeline" "this" {
       configuration = {
         InspectorRunMode  = "ECRImageScan"
         ECRRepositoryName = module.ecr.repository_name
-        # Image tag comes from the build. We scan :latest-equivalent by tag var.
-        ImageTag          = var.image_tag
+        # Scan the moving :latest tag the buildspec pushes each run.
+        ImageTag          = "latest"
         CriticalThreshold = "2" # baseline; 3rd critical fails
         HighThreshold     = "7" # baseline; 8th high fails
         MediumThreshold   = "8"
