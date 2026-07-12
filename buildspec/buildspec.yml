@@ -1,0 +1,45 @@
+version: 0.2
+
+# FinBank CodeBuild buildspec
+#
+# Job: build the container image, push it to ECR (SHA-tagged, immutable), and
+# emit the artifact the ECS deploy stage needs (imagedefinitions.json).
+# Security SCANNING is NOT here -- it runs as native InspectorScan actions in
+# the pipeline, keeping build and scan concerns separate.
+#
+# Required environment variables (set on the CodeBuild project by Terraform):
+#   AWS_ACCOUNT_ID  - your account id
+#   AWS_REGION      - e.g. us-east-1
+#   ECR_REPO_URL    - full ECR repo URI
+#   CONTAINER_NAME  - must match the container name in the ECS task def
+
+phases:
+  pre_build:
+    commands:
+      - echo "Logging in to Amazon ECR..."
+      - aws ecr get-login-password --region "$AWS_REGION" | docker login --username AWS --password-stdin "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com"
+      # Use the git commit SHA as the image tag -- ties a running image to an
+      # exact commit. CODEBUILD_RESOLVED_SOURCE_VERSION is provided by CodeBuild.
+      - IMAGE_TAG="${CODEBUILD_RESOLVED_SOURCE_VERSION:-latest}"
+      - IMAGE_TAG="${IMAGE_TAG:0:12}"   # short SHA
+      - echo "Image tag will be $IMAGE_TAG"
+
+  build:
+    commands:
+      - echo "Building image..."
+      # The app lives in ./app (Dockerfile is there).
+      - docker build -t "$ECR_REPO_URL:$IMAGE_TAG" ./app
+
+  post_build:
+    commands:
+      - echo "Pushing image to ECR..."
+      - docker push "$ECR_REPO_URL:$IMAGE_TAG"
+      # Emit imagedefinitions.json -- the ECS deploy action reads this to know
+      # which image to deploy. containerName MUST match the task definition.
+      - printf '[{"name":"%s","imageUri":"%s"}]' "$CONTAINER_NAME" "$ECR_REPO_URL:$IMAGE_TAG" > imagedefinitions.json
+      - echo "Wrote imagedefinitions.json:"
+      - cat imagedefinitions.json
+
+artifacts:
+  files:
+    - imagedefinitions.json

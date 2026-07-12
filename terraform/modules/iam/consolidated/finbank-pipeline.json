@@ -1,0 +1,84 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "ManageFinbankRoles",
+      "Effect": "Allow",
+      "Action": [
+        "iam:CreateRole", "iam:DeleteRole", "iam:GetRole", "iam:TagRole",
+        "iam:UntagRole", "iam:ListRoleTags", "iam:AttachRolePolicy",
+        "iam:DetachRolePolicy", "iam:ListAttachedRolePolicies", "iam:ListRolePolicies",
+        "iam:PutRolePolicy", "iam:DeleteRolePolicy", "iam:GetRolePolicy",
+        "iam:UpdateAssumeRolePolicy", "iam:PassRole"
+      ],
+      "Resource": [
+        "arn:aws:iam::649966626634:role/finbank-ecs-task-execution",
+        "arn:aws:iam::649966626634:role/finbank-ecs-task",
+        "arn:aws:iam::649966626634:role/finbank-codebuild-*",
+        "arn:aws:iam::649966626634:role/finbank-codepipeline-*"
+      ]
+    },
+    {
+      "Sid": "ReadRolesForCreate",
+      "Effect": "Allow",
+      "Action": ["iam:ListRoles"],
+      "Resource": "*"
+    },
+    {
+      "Sid": "CodeConnections",
+      "Effect": "Allow",
+      "Action": [
+        "codestar-connections:CreateConnection", "codestar-connections:DeleteConnection",
+        "codestar-connections:GetConnection", "codestar-connections:ListConnections",
+        "codestar-connections:TagResource", "codestar-connections:UntagResource",
+        "codestar-connections:ListTagsForResource", "codestar-connections:UseConnection",
+        "codestar-connections:PassConnection",
+        "codeconnections:CreateConnection", "codeconnections:DeleteConnection",
+        "codeconnections:GetConnection", "codeconnections:ListConnections",
+        "codeconnections:TagResource", "codeconnections:UntagResource",
+        "codeconnections:ListTagsForResource", "codeconnections:UseConnection",
+        "codeconnections:PassConnection"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "ArtifactBucket",
+      "Effect": "Allow",
+      "Action": [
+        "s3:CreateBucket", "s3:DeleteBucket", "s3:PutBucketPolicy", "s3:GetBucketPolicy",
+        "s3:DeleteBucketPolicy", "s3:PutBucketPublicAccessBlock", "s3:GetBucketPublicAccessBlock",
+        "s3:PutBucketVersioning", "s3:GetBucketVersioning", "s3:PutEncryptionConfiguration",
+        "s3:GetEncryptionConfiguration", "s3:PutBucketTagging", "s3:GetBucketTagging",
+        "s3:PutBucketAcl", "s3:GetBucketAcl", "s3:GetBucketLocation", "s3:ListBucket",
+        "s3:PutObject", "s3:GetObject", "s3:DeleteObject", "s3:ListBucketVersions",
+        "s3:DeleteObjectVersion"
+      ],
+      "Resource": [
+        "arn:aws:s3:::finbank-pipeline-artifacts-*",
+        "arn:aws:s3:::finbank-pipeline-artifacts-*/*"
+      ]
+    },
+    {
+      "Sid": "CodeBuildManagement",
+      "Effect": "Allow",
+      "Action": [
+        "codebuild:CreateProject", "codebuild:DeleteProject", "codebuild:UpdateProject",
+        "codebuild:BatchGetProjects", "codebuild:ListProjects", "codebuild:StartBuild",
+        "codebuild:StopBuild", "codebuild:BatchGetBuilds", "codebuild:ListBuildsForProject"
+      ],
+      "Resource": "arn:aws:codebuild:us-east-1:649966626634:project/finbank-*"
+    },
+    {
+      "Sid": "CodePipelineManagement",
+      "Effect": "Allow",
+      "Action": [
+        "codepipeline:CreatePipeline", "codepipeline:DeletePipeline", "codepipeline:UpdatePipeline",
+        "codepipeline:GetPipeline", "codepipeline:GetPipelineState", "codepipeline:ListPipelines",
+        "codepipeline:StartPipelineExecution", "codepipeline:GetPipelineExecution",
+        "codepipeline:ListPipelineExecutions", "codepipeline:TagResource",
+        "codepipeline:UntagResource", "codepipeline:ListTagsForResource"
+      ],
+      "Resource": "arn:aws:codepipeline:us-east-1:649966626634:finbank-*"
+    }
+  ]
+}

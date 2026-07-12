@@ -9,6 +9,11 @@ terraform {
       # resources from Phase 1, so this is a safe in-place bump.
       version = "~> 6.0"
     }
+
+    random = {
+      source  = "hashicorp/random"
+      version = "~> 3.0"
+    }
   }
 
   # NOTE: state is local for now (a terraform.tfstate file on your machine).
