@@ -2,24 +2,41 @@ version: 0.2
 
 # FinBank CodeBuild buildspec
 #
-# Builds the container image and pushes TWO tags to ECR:
-#   - <short-sha> : per-commit traceability (which exact commit is this image)
-#   - latest      : moving pointer the ImageScan action + ECS deploy target
-# Repo is MUTABLE so :latest can be re-pushed each build.
+# Layered gates:
+#   1. Secret scan (git-secrets) on the APPLICATION source (app/). Fails the
+#      build if hardcoded credentials are found, before any image is built.
+#      We scan the app/ directory specifically -- not the repo root -- so the
+#      scan targets real source and not git-secrets' own .git/config plumbing.
+#   2. Build + push (short-SHA tag for traceability, latest as the moving tag).
 #
-# Security scanning is NOT here -- it runs as native InspectorScan pipeline
-# actions. This buildspec only builds and publishes.
-#
-# Required environment variables (set on the CodeBuild project by Terraform):
-#   AWS_ACCOUNT_ID, AWS_REGION, ECR_REPO_URL, CONTAINER_NAME
+# Required env vars: AWS_ACCOUNT_ID, AWS_REGION, ECR_REPO_URL, CONTAINER_NAME
 
 phases:
+  install:
+    commands:
+      - echo "Installing git-secrets..."
+      - git clone --depth 1 https://github.com/awslabs/git-secrets.git /tmp/git-secrets
+      - (cd /tmp/git-secrets && make install)
+
   pre_build:
     commands:
+      # ---- SECRET SCAN GATE ----
+      - echo "Scanning application source for hardcoded secrets..."
+      # git-secrets needs git config to store patterns; init a throwaway repo.
+      - git init -q .
+      - git config user.email "ci@finbank.local"
+      - git config user.name "finbank-ci"
+      - git secrets --register-aws
+      # Scan ONLY the application source directory (app/). This avoids matching
+      # git-secrets' own .git/config plumbing and targets real code. Exits
+      # non-zero on a finding, failing the build before any image is built.
+      - git secrets --scan -r ./app
+      - echo "No secrets found in application source. Proceeding to build."
+      # ---- ECR login ----
       - echo "Logging in to Amazon ECR..."
       - aws ecr get-login-password --region "$AWS_REGION" | docker login --username AWS --password-stdin "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com"
       - IMAGE_TAG="${CODEBUILD_RESOLVED_SOURCE_VERSION:-latest}"
-      - IMAGE_TAG="${IMAGE_TAG:0:12}"   # short SHA
+      - IMAGE_TAG="${IMAGE_TAG:0:12}"
       - echo "Image tags will be $IMAGE_TAG and latest"
 
   build:
@@ -33,8 +50,6 @@ phases:
       - echo "Pushing images to ECR..."
       - docker push "$ECR_REPO_URL:$IMAGE_TAG"
       - docker push "$ECR_REPO_URL:latest"
-      # ECS deploy reads imagedefinitions.json. Point it at the SHA tag so the
-      # running task records the exact commit deployed (better than :latest).
       - printf '[{"name":"%s","imageUri":"%s"}]' "$CONTAINER_NAME" "$ECR_REPO_URL:$IMAGE_TAG" > imagedefinitions.json
       - echo "Wrote imagedefinitions.json:"
       - cat imagedefinitions.json
