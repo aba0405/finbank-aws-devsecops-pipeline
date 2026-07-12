@@ -3,11 +3,10 @@ version: 0.2
 # FinBank CodeBuild buildspec
 #
 # Layered gates:
-#   1. Secret scan (git-secrets) -- fails the build if hardcoded credentials
-#      are found in source. Runs BEFORE the image is built.
-#      NOTE: CodePipeline delivers source as a plain file bundle (no .git), so
-#      we init a throwaway git repo first -- git-secrets stores its patterns in
-#      git config and needs a repo to operate.
+#   1. Secret scan (git-secrets) on the APPLICATION source (app/). Fails the
+#      build if hardcoded credentials are found, before any image is built.
+#      We scan the app/ directory specifically -- not the repo root -- so the
+#      scan targets real source and not git-secrets' own .git/config plumbing.
 #   2. Build + push (short-SHA tag for traceability, latest as the moving tag).
 #
 # Required env vars: AWS_ACCOUNT_ID, AWS_REGION, ECR_REPO_URL, CONTAINER_NAME
@@ -22,17 +21,17 @@ phases:
   pre_build:
     commands:
       # ---- SECRET SCAN GATE ----
-      - echo "Scanning source for hardcoded secrets..."
-      # CodePipeline source has no .git; init a throwaway repo so git-secrets
-      # has git config to register patterns against.
+      - echo "Scanning application source for hardcoded secrets..."
+      # git-secrets needs git config to store patterns; init a throwaway repo.
       - git init -q .
       - git config user.email "ci@finbank.local"
       - git config user.name "finbank-ci"
       - git secrets --register-aws
-      # --scan -r scans recursively. Exits non-zero if a secret is found,
-      # failing the build here before any image is built or pushed.
-      - git secrets --scan -r .
-      - echo "No secrets found. Proceeding to build."
+      # Scan ONLY the application source directory (app/). This avoids matching
+      # git-secrets' own .git/config plumbing and targets real code. Exits
+      # non-zero on a finding, failing the build before any image is built.
+      - git secrets --scan -r ./app
+      - echo "No secrets found in application source. Proceeding to build."
       # ---- ECR login ----
       - echo "Logging in to Amazon ECR..."
       - aws ecr get-login-password --region "$AWS_REGION" | docker login --username AWS --password-stdin "$AWS_ACCOUNT_ID.dkr.ecr.$AWS_REGION.amazonaws.com"
