@@ -8,7 +8,7 @@ It builds a containerized application, runs layered security scans, **enforces
 gates that stop non-compliant releases**, deploys compliant images to ECS
 Fargate, and alerts the team automatically when a gate blocks a deploy.
 
-![App live behind the ALB](docs/screenshots/phase2-app-live-via-alb.png)
+![A blocked deploy triggers an automatic alert](docs/screenshots/phase4-alert-email.png)
 
 ---
 
@@ -75,6 +75,8 @@ A clean image (baseline: 2 Critical / 8 High) passes all gates and deploys to EC
 
 ![App live via ALB](docs/screenshots/phase2-app-live-via-alb.png)
 
+![App live via ALB](docs/screenshots/phase2-app-live-via-alb.png)
+
 ### 2. Vulnerable dependencies blocked
 A branch with deliberately outdated packages (Flask 0.12.2, PyYAML 3.13, etc.)
 produced **3 Critical / 20 High** findings - far over threshold. The SAST/SCA gate
@@ -93,9 +95,9 @@ Medium severity vulnerabilities found: 18
 A branch with a hardcoded AWS access key was caught by git-secrets at
 `app/insecure_config.py:16`, failing the build before an image was produced.
 
-![Secret blocked](docs/screenshots/phase3e-gate-blocks-secret.png)
+![Pipeline blocked at Build stage](docs/screenshots/phase3e-gate-blocks-secret.png)
 
-_Scan log detail: `docs/screenshots/phase3e-secret-scan-log.png`_
+![git-secrets caught the AWS key](docs/screenshots/phase3e-secret-scan-log.png)
 
 ### 4. The gate caught real vulnerability drift
 On the first full pipeline run, the image gate blocked a deploy - not because of a
@@ -105,9 +107,7 @@ time even when code is frozen** - exactly why gates matter.
 
 ### 5. A blocked deploy triggers an automatic alert
 When a gate fails, EventBridge catches the FAILED pipeline state and SNS emails the
-team - closing the loop from detection to notification.
-
-![Alert email](docs/screenshots/phase4-alert-email.png)
+team - closing the loop from detection to notification. (Screenshot at top of this README.)
 
 ### Observability dashboard
 ![Dashboard](docs/screenshots/phase4-dashboard.png)
