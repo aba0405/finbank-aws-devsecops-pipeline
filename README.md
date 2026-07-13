@@ -75,8 +75,6 @@ A clean image (baseline: 2 Critical / 8 High) passes all gates and deploys to EC
 
 ![App live via ALB](docs/screenshots/phase2-app-live-via-alb.png)
 
-![App live via ALB](docs/screenshots/phase2-app-live-via-alb.png)
-
 ### 2. Vulnerable dependencies blocked
 A branch with deliberately outdated packages (Flask 0.12.2, PyYAML 3.13, etc.)
 produced **3 Critical / 20 High** findings - far over threshold. The SAST/SCA gate
